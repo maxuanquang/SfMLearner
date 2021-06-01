@@ -44,8 +44,8 @@ def main(_):
                 idx = t + b
                 if idx >= len(test_files):
                     break
-                fh = open(test_files[idx], 'r')
-                raw_im = pil.open(fh)
+                # fh = open(test_files[idx], 'r')
+                raw_im = pil.open(test_files[idx])
                 scaled_im = raw_im.resize((FLAGS.img_width, FLAGS.img_height), pil.ANTIALIAS)
                 inputs[b] = np.array(scaled_im)
                 # im = scipy.misc.imread(test_files[idx])

@@ -137,7 +137,8 @@ def read_calib_file(path):
             if float_chars.issuperset(value):
                 # try to cast to float array
                 try:
-                    data[key] = np.array(map(float, value.split(' ')))
+                    value = value.split(' ')
+                    data[key] = np.asarray(value, dtype=np.float)
                 except ValueError:
                     # casting error: data[key] already eq. value, so pass
                     pass
@@ -172,6 +173,8 @@ def generate_depth_map(calib_dir, velo_file_name, im_shape, cam=2, interp=False,
     # load calibration files
     cam2cam = read_calib_file(calib_dir + 'calib_cam_to_cam.txt')
     velo2cam = read_calib_file(calib_dir + 'calib_velo_to_cam.txt')
+    velo2cam['R'] = np.array(velo2cam['R'])
+    velo2cam['T'] = np.array(velo2cam['T'])
     velo2cam = np.hstack((velo2cam['R'].reshape(3,3), velo2cam['T'][..., np.newaxis]))
     velo2cam = np.vstack((velo2cam, np.array([0, 0, 0, 1.0])))
 
@@ -207,7 +210,7 @@ def generate_depth_map(calib_dir, velo_file_name, im_shape, cam=2, interp=False,
 
     # find the duplicate points and choose the closest depth
     inds = sub2ind(depth.shape, velo_pts_im[:, 1], velo_pts_im[:, 0])
-    dupe_inds = [item for item, count in Counter(inds).iteritems() if count > 1]
+    dupe_inds = [item for item, count in Counter(inds).items() if count > 1]
     for dd in dupe_inds:
         pts = np.where(inds==dd)[0]
         x_loc = int(velo_pts_im[pts[0], 0])
